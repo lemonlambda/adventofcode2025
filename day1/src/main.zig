@@ -22,9 +22,9 @@ pub fn main() !void {
         const rotation = try std.fmt.parseInt(i32, line[1..], 10);
 
         if (is_right(line[0])) {
-            overflowing_clamped_add(&current_code, rotation, 100);
+            go_right(&current_code, rotation, 100);
         } else {
-            overflowing_clamped_sub(&current_code, rotation, 100);
+            go_left(&current_code, rotation, 100);
         }
 
         if (current_code == 0 or current_code == 100) {
@@ -36,20 +36,12 @@ pub fn main() !void {
     std.debug.print("password: {}\n", .{password});
 }
 
-fn overflowing_clamped_add(to_modify: *i32, value: i32, max_value: i32) void {
-    if (to_modify.* + value > max_value) {
-        to_modify.* = (to_modify.* + value) - max_value;
-    } else {
-        to_modify.* += value;
-    }
+fn go_right(to_modify: *i32, value: i32, max_value: i32) void {
+    to_modify.* = @mod(to_modify.* + value, max_value);
 }
 
-fn overflowing_clamped_sub(to_modify: *i32, value: i32, max_value: i32) void {
-    if (to_modify.* - value < 0) {
-        to_modify.* = max_value - @as(i32, @intCast(@abs(to_modify.* - value)));
-    } else {
-        to_modify.* -= value;
-    }
+fn go_left(to_modify: *i32, value: i32, max_value: i32) void {
+    to_modify.* = @mod(to_modify.* - value, max_value);
 }
 
 fn is_right(value: u8) bool {
